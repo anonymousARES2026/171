@@ -164,8 +164,12 @@ function isHttpUrl(s) {
 function renderLinksHtml(urls) {
   const safe = (urls || []).filter(isHttpUrl);
   if (safe.length === 0) return '<span class="detail-value">(none)</span>';
+
   return safe
-    .map(u => `<a href="${escapeHtml(u)}" target="_blank" rel="noopener noreferrer">${escapeHtml(u)}</a>`)
+    .map((u, index) => {
+      const label = 'Link ' + (index + 1);
+      return `<a href="${escapeHtml(u)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
+    })
     .join('<br>');
 }
 
@@ -751,6 +755,92 @@ function isClosedLicense(license) {
   return t.includes('closed');
 }
 
+function toggleToolCard(card, toolId) {
+  const willExpand = !card.classList.contains('expanded');
+
+  document.querySelectorAll('#toolsGrid .tool-card.expanded').forEach(other => {
+    if (other !== card) other.classList.remove('expanded');
+  });
+
+  if (willExpand) {
+    card.classList.add('expanded');
+    state.expandedId = toolId;
+  } else {
+    card.classList.remove('expanded');
+    state.expandedId = null;
+  }
+}
+
+function renderPipelineStagesGraphic(pipeline) {
+  const input = String(pipeline || '').trim();
+  if (!input) return '—';
+
+  const tokens = input.match(/\[\d+\]|\(\d+\)|-|=/g);
+  if (!tokens || !tokens.length) return escapeHtml(input);
+
+  const parts = tokens.map(token => {
+    if (/^\[\d+\]$/.test(token) || /^\(\d+\)$/.test(token)) {
+      const stage = token.replace(/\D/g, '');
+      const active = token.startsWith('[');
+
+      return `
+        <span
+          title="${active ? 'Used in stage ' : 'Not used in stage '}${stage}"
+          aria-label="${active ? 'Used in stage ' : 'Not used in stage '}${stage}"
+          style="
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            width:1.28em;
+            height:1.28em;
+            font:700 0.68rem/1 system-ui,sans-serif;
+            border-radius:999px;
+            border:1.2px solid ${active ? '#2563eb' : '#94a3b8'};
+            background:${active ? '#2563eb' : 'transparent'};
+            color:${active ? '#ffffff' : '#475569'};
+            box-sizing:border-box;
+            flex:0 0 auto;
+          "
+        >${stage}</span>
+      `;
+    }
+
+    const activeTransition = token === '-';
+
+    return `
+      <span
+        title="${activeTransition ? 'Used in transition' : 'No transition'}"
+        aria-hidden="true"
+        style="
+          display:inline-block;
+          width:${activeTransition ? '0.95em' : '0.78em'};
+          height:0;
+          border-top:${activeTransition ? '3.6px solid #2563eb' : '1.2px solid #cbd5e1'};
+          opacity:${activeTransition ? '1' : '0.75'};
+          margin:0 0.015em;
+          flex:0 0 auto;
+        "
+      ></span>
+    `;
+  });
+
+  return `
+    <span
+      class="pipeline-graphic"
+      aria-label="Pipeline stages ${escapeHtml(input)}"
+      style="
+        display:inline-flex;
+        align-items:center;
+        gap:0;
+        white-space:nowrap;
+        vertical-align:middle;
+      "
+    >
+      ${parts.join('')}
+    </span>
+  `;
+}
+
 function renderCards(tools) {
   const grid = document.getElementById('toolsGrid');
 
@@ -786,9 +876,14 @@ function renderCards(tools) {
       : '—';
 
     const tags = [];
-    if (tool.toolInput) tags.push(tool.toolInput);
-    if (tool.primaryApproach && tool.primaryApproach.length) tags.push(tool.primaryApproach[0]);
-    if (tool.outputKinds) tags.push(tool.outputKinds);
+    if (tool.toolInput) {
+      var separateToolInputs = tool.toolInput.split(/\r?\n|\r|\n/g);
+      separateToolInputs.forEach(toolInput => {
+        tags.push(toolInput);
+      });
+    }
+    //if (tool.primaryApproach && tool.primaryApproach.length) tags.push(tool.primaryApproach[0]);
+    //if (tool.outputKinds) tags.push(tool.outputKinds);
 
     let html =
       '<div class="card-header">' +
@@ -807,7 +902,7 @@ function renderCards(tools) {
 
     html += '<div class="card-footer">' +
       '<span class="status-indicator"><span class="status-dot ' + statusDotClass + '" aria-hidden="true"></span>' +
-      escapeHtml(statusLabel) +
+      'Maintained: ' + escapeHtml(statusLabel) +
       '</span>' +
       '<span class="badge ' + licenseTag + '">' + escapeHtml(licenseIsOpen ? 'Open Source' : 'Closed Source') + '</span>' +
       '</div>';
@@ -816,8 +911,8 @@ function renderCards(tools) {
 
     html += '<div class="detail-item"><div class="detail-label">Tool Name</div><div class="detail-value">' + escapeHtml(tool.name) + '</div></div>';
     html += '<div class="detail-item"><div class="detail-label">ZKP Class</div><div class="detail-value">' + escapeHtml((tool.zkpClass || []).join(', ') || '—') + '</div></div>';
-    html += '<div class="detail-item"><div class="detail-label">Tool Input</div><div class="detail-value">' + escapeHtml(tool.toolInput || '—') + '</div></div>';
-    html += '<div class="detail-item"><div class="detail-label">Pipeline Stages</div><div class="detail-value">' + escapeHtml(tool.pipelineStages || '—') + '</div></div>';
+    html += '<div class="detail-item"><div class="detail-label">Tool Input</div><div class="detail-value">' + escapeHtml(separateToolInputs.join(", ") || '—') + '</div></div>';
+    html += '<div class="detail-item"><div class="detail-label">Pipeline Stages</div><div class="detail-value">' + renderPipelineStagesGraphic(tool.pipelineStages || '—') + '</div></div>';
 
     html += '<div class="detail-item"><div class="detail-label">Primary Analysis Approach</div><div class="detail-value">' + escapeHtml((tool.primaryApproach || []).join(', ') || '—') + '</div></div>';
     html += '<div class="detail-item"><div class="detail-label">Targeted Vulnerabilities</div><div class="detail-value">' + escapeHtml((tool.vulnerabilities || []).join(', ') || '—') + '</div></div>';
@@ -827,7 +922,7 @@ function renderCards(tools) {
     html += '<div class="detail-item"><div class="detail-label">Last Major Update</div><div class="detail-value">' + escapeHtml(tool.lastMajorUpdateYear || '—') + '</div></div>';
 
     html += '<div class="detail-item"><div class="detail-label">License</div><div class="detail-value">' + escapeHtml(tool.license || '—') + '</div></div>';
-    html += '<div class="detail-item"><div class="detail-label">Usability</div><div class="detail-value">' + escapeHtml(tool.usability == null ? '—' : String(tool.usability)) + '</div></div>';
+    html += '<div class="detail-item"><div class="detail-label">Usability</div><div class="detail-value">' + renderUsabilityGraphic(tool.usability) + '</div></div>';
 
     html += '<div class="detail-item"><div class="detail-label">Kinds of Output</div><div class="detail-value">' + escapeHtml(tool.outputKinds || '—') + '</div></div>';
     html += '<div class="detail-item"><div class="detail-label">Academic References</div><div class="detail-value">' + escapeHtml(tool.academicRefs || '—') + '</div></div>';
@@ -841,21 +936,52 @@ function renderCards(tools) {
 
     card.innerHTML = html;
 
-    card.addEventListener('click', function () {
-      state.expandedId = state.expandedId === tool.id ? null : tool.id;
-      renderCards(getFilteredTools());
+    card.addEventListener('click', function (e) {
+      if (e.target.closest('a, button')) return;
+      toggleToolCard(card, tool.id);
     });
 
     card.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        state.expandedId = state.expandedId === tool.id ? null : tool.id;
-        renderCards(getFilteredTools());
+        toggleToolCard(card, tool.id);
       }
     });
 
     grid.appendChild(card);
   });
+}
+
+function renderUsabilityGraphic(value) {
+  if (value == null || value === '') return '—';
+
+  const n = Number(value);
+  if (![0, 1, 2].includes(n)) return escapeHtml(String(value));
+
+  const symbol = n === 0 ? '◯' : (n === 1 ? '◐' : '⬤');
+  const textual = n === 0 ? 'little' : (n === 1 ? 'medium' : 'high');
+
+  return `
+    <span
+      title="Usability: ${n} (${textual})"
+      aria-label="Usability ${n}"
+      style="
+        display:inline-flex;
+        align-items:center;
+        gap:0.4em;
+        white-space:nowrap;
+      "
+    >
+      <span
+        style="
+          font-size:1.05em;
+          line-height:1;
+          color:#2563eb;
+        "
+      >${symbol}</span>
+      <span>(${textual})</span>
+    </span>
+  `;
 }
 
 function render() {

@@ -945,3 +945,45 @@ footer strong {
   text-align: center;
   color: var(--text-secondary);
 }
+
+.card-description {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.card-description::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.6em;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    var(--bg-card) 85%
+  );
+}
+
+.tool-card.expanded .card-description {
+  overflow: visible;
+  display: block;
+  -webkit-line-clamp: unset;
+}
+
+.tool-card.expanded .card-description::after {
+  display: none;
+}
+
+.card-description {
+  transition: max-height var(--transition-normal), opacity var(--transition-normal);
+}
