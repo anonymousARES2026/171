@@ -642,13 +642,6 @@ body {
   font-weight: 500;
 }
 
-.card-description {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-bottom: 14px;
-  line-height: 1.5;
-}
-
 .card-footer {
   display: flex;
   align-items: center;
@@ -957,6 +950,8 @@ footer strong {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+
+  transition: max-height var(--transition-normal), opacity var(--transition-normal);
 }
 
 .card-description::after {
@@ -982,8 +977,4 @@ footer strong {
 
 .tool-card.expanded .card-description::after {
   display: none;
-}
-
-.card-description {
-  transition: max-height var(--transition-normal), opacity var(--transition-normal);
 }
