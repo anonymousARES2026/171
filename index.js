@@ -629,6 +629,16 @@ function toggleFilter(key, value) {
   render();
 }
 
+function formatMonthYear(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '—';
+
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC'
+  });
+}
+
 function renderFilters() {
   const container = document.getElementById('filtersRow');
   container.innerHTML = '';
@@ -919,7 +929,7 @@ function renderCards(tools) {
     html += '<div class="detail-item"><div class="detail-label">Security Guarantees</div><div class="detail-value">' + escapeHtml((tool.guarantees || []).join(', ') || '—') + '</div></div>';
 
     html += '<div class="detail-item"><div class="detail-label">Actively Maintained</div><div class="detail-value">' + escapeHtml(tool.maintained || '—') + '</div></div>';
-    html += '<div class="detail-item"><div class="detail-label">Last Major Update</div><div class="detail-value">' + escapeHtml(tool.lastMajorUpdateYear || '—') + '</div></div>';
+    html += '<div class="detail-item"><div class="detail-label">Last Major Update</div><div class="detail-value">' + escapeHtml(formatMonthYear(tool.lastMajorUpdate)) + '</div></div>';
 
     html += '<div class="detail-item"><div class="detail-label">License</div><div class="detail-value">' + escapeHtml(tool.license || '—') + '</div></div>';
     html += '<div class="detail-item"><div class="detail-label">Usability</div><div class="detail-value">' + renderUsabilityGraphic(tool.usability) + '</div></div>';
