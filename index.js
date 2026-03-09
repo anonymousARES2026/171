@@ -959,7 +959,7 @@ function renderUsabilityGraphic(value) {
   if (![0, 1, 2].includes(n)) return escapeHtml(String(value));
 
   const symbol = n === 0 ? '◯' : (n === 1 ? '◐' : '⬤');
-  const textual = n === 0 ? 'little' : (n === 1 ? 'medium' : 'high');
+  const textual = n === 0 ? 'low' : (n === 1 ? 'medium' : 'high');
 
   return `
     <span
