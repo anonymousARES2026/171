@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZKP Security and Correctness Analysis Tools Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="index.css" rel="stylesheet">
+</head>
+<body>
+<header class="hero" role="banner">
+  <div class="hero-content">
+    <h1>ZKP Security and Correctness Analysis Tools Explorer</h1>
+    <p>Browse, filter, and explore zero-knowledge proof circuit analysis tools — from static analyzers to fuzzers and formal verifiers.</p>
+    <div class="hero-badges" aria-label="Dataset views">
+      <button
+        class="hero-badge hero-badge-button is-active"
+        id="toolsViewBadge"
+        type="button"
+        aria-pressed="true"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+        </svg>
+        <span id="totalToolCount">0 Tools</span>
+      </button>
+
+      <button
+        class="hero-badge hero-badge-button is-inactive"
+        id="discardedViewBadge"
+        type="button"
+        aria-pressed="false"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"></circle>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+        </svg>
+        <span id="discardedToolCount">0 Discarded Tools</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <section id="toolsSection">
+    <section class="controls-section" role="search" aria-label="Search and filter tools">
+      <div class="search-row">
+        <div class="search-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" class="search-input" id="searchInput" placeholder="Search tools by name, description, technique..." aria-label="Search tools">
+        </div>
+        <div class="sort-wrapper">
+          <label for="sortSelect" class="sr-only">Sort tools</label>
+          <select class="sort-select" id="sortSelect" aria-label="Sort tools">
+            <option value="name-asc">Name A–Z</option>
+            <option value="name-desc">Name Z–A</option>
+            <option value="assignee-asc">Assignee A–Z</option>
+          </select>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light theme" title="Toggle theme">
+          <svg id="sunIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg id="moonIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+
+      <div class="filters-row" id="filtersRow" role="group" aria-label="Filter options"></div>
+      <div class="pills-row" id="pillsRow" aria-live="polite" aria-label="Active filters"></div>
+    </section>
+
+    <div class="results-bar">
+      <div class="results-count" id="resultsCount" aria-live="polite"></div>
+    </div>
+
+    <main class="tools-grid" id="toolsGrid" role="list" aria-label="Tools list"></main>
+  </section>
+
+  <section
+    class="discarded-section"
+    id="discardedSection"
+    aria-labelledby="discardedSectionTitle"
+    hidden
+  >
+    <div class="discarded-section-header">
+      <div>
+        <h2 id="discardedSectionTitle">Discarded Tools</h2>
+        <p>Tools excluded from the main explorer according to the inclusion criteria.</p>
+      </div>
+    </div>
+
+    <div class="discarded-table-wrapper">
+      <table class="discarded-table">
+        <thead>
+          <tr>
+            <th>Tool Name</th>
+            <th>IC not met</th>
+            <th>Tool References</th>
+            <th>Brief Description</th>
+          </tr>
+        </thead>
+        <tbody id="discardedToolsTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<footer role="contentinfo">
+  <p><strong>ZKP Security and Correctness Analysis Tools Explorer</strong> — An interactive browser for zero-knowledge proof circuit analysis tools and research.<br>Built for researchers, auditors, and developers working with SNARKs and STARKs.</p>
+</footer>
+
+<script src="index.js"></script>
+
+</body>
+</html>

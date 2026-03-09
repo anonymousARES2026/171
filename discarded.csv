@@ -1,0 +1,24 @@
+Tool Name,IC not meet,Tool References,Brief Description
+Circomscribe,IC3,"https://www.circomscribe.dev/
+https://blog.zksecurity.xyz/posts/circomscribe/","Circomscribe is a tool showing what lines of a given Circom file produce what constraints (if any).\footnote{You like Circom but you find it confusing? Introducing Circomscribe - ZK/SEC Quarterly (\url{https://blog.zksecurity.xyz/posts/circomscribe/})} Circomscribe shows only the first output of the Circom compiler, but not what the actual compiled circuit looks like. Essentially, Circomscribe is a modified version of the Circom compiler running in WebAssembly (Wasm) and reporting information in a JSON format. Albeit interesting, Circomscribe is not actually a security analysis tool, but rather a simple code inspector."
+CM,IC2,https://arxiv.org/abs/2507.19012,"Similar to CMDCGD and CMS, but not relevant: it is only about smart contracts and never even mention ZKP"
+zkwasm-fv,IC3,"https://github.com/CertiKProject/zkwasm-fv
+https://www.certik.com/resources/blog/advanced-formal-verification-of-zero-knowledge-proof-blockchains
+https://www.certik.com/resources/blog/advanced-formal-verification-of-zkp-verifying-a-zk-instruction
+https://www.certik.com/resources/blog/advanced-formal-verification-of-zkp-a-tale-of-two-zk-bugs
+https://www.certik.com/resources/blog/advanced-formal-verification-of-zkp-how-zk-memory-was-proven",I would exclude this because it is more about verifying a zkVM
+fAmulet,IC2,https://arxiv.org/abs/2410.12210,"not sure about relevance: addresses finalization problems specific for layer 2 smart contracts, is quite targeted to the roll-up and zk generation phases, but it seems not directly ZKPs"
+OWBB,IC4,https://link.springer.com/article/10.1007/s10703-025-00476-3,We have implemented our approach in the CirC ZKP compiler and have proved bounded versions of the corresponding verification conditions. We show that our partially verified field-blaster does not hurt the performance of the compiler or its output; we also report on four bugs uncovered during verification.
+TSWCTS,IC1,https://eprint.iacr.org/2024/514,no implementation; various methodology for auditing
+Distiller,IC5,https://ieeexplore.ieee.org/abstract/document/10179393,"Verified compiler, cool but more focused on construction of correct frontends"
+Clap,IC5,https://arxiv.org/abs/2405.12115,"Verified compiler, cool but more about the compilers"
+AGLST,IC5,https://dl.acm.org/doi/abs/10.1145/3497775.3503675,"verified compiler, unlikely to be supported, uses the old Lean3 proof assistant. Compiles circuit into algebraic representation and verifies the correctness"
+Tabby,IC5,https://dl.acm.org/doi/abs/10.1145/3763110,"verfied compiler (actually translation-validation based): We present Tabby, a synthesis-aided compiler that automates the generation of high-performance ZK circuits from high-level code"
+SCLL,IC1,https://ieeexplore.ieee.org/document/10356587,foundational result (IC1) for static-analysis: Normalization of R1CS circuits via data-flow analysis. More related to the analysis itself than building a tool. Not useful (I think) for security purposes
+OrCa,IC2,https://veridise.com/security/tools/fuzzer/,targets smart contracts
+PinocchioQ [C -> Pinocchio],IC5,https://ieeexplore.ieee.org/document/7536381,"Verified compiler, C to R1CS compiler, verified; ""Based on CompCert and developed in Coq, our compiler targets an architecture whose instructions consist solely of quadratic equations over a large finite field, amenable to succinct verification using the Pinocchio cryptographic scheme."
+POPBPDB,IC1,https://link.springer.com/chapter/10.1007/978-3-031-98668-0_17,"SMT It's a CAV paper, so it is a bit more foundational and related to the SMT algorithm"
+MTZK,IC3,"https://www.ndss-symposium.org/wp-content/uploads/2025-530-paper.pdf
+
+https://sites.google.com/view/mtzk","compiler tester, not for zkp circuits/programs (IC3), testing, Testing a metamorphic testing framework to test ZK compilers and uncover incorrect compilations"
+OPBFBD,IC1,https://link.springer.com/chapter/10.1007/978-3-031-65627-9_1,"foundational result (IC1), SMT, Algorithmic/foundational result"
